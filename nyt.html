@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <style type="text/css">
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.footer {
+   color: #888888;
+   font-size: 13px;
+   text-align: right;
+}
+
+#states path {
+ fill: #ccc;
+ stroke: #fff;
+}
+
+circle {
+ fill: steelblue;
+ fill-opacity: .6;
+ stroke: #fff;
+}
+
+.container {
+ float: left;
+}
+
+div.mouseover{
+ position: absolute;
+ background: white;
+ border: 2px solid #131313;
+ color: black;
+ padding: 5px 8px;
+ margin-left: 100px;
+ margin-top: 50px;
+ display: none;
+}
+
+.legend {
+  fill: black;
+  font: 14px sans-serif;
+  text-anchor: start;
+  font-size: 12px;
+}
+
+#pop {
+    padding-left:300px;
+}
+
+#obs{
+  padding-left: 1100px;
+}
+
+   </style>
+
+
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css" />
+
+
+<script src="http://d3js.org/d3.v3.js"></script>
+<div class="mouseover"></div>
+
+
+
+</head>
+
+<body>
+  <div style="text-align: center;">
+  <div style="text-align: center;">
+<h1 align="center" style="font-size: 400%;">Explosion of General and Obese Population in New York City</h1>
+</br></br>
+<h2 id="pop" style="text-align:left; float:left">Growth In Overall Population</h2>
+<h2 id="obs" style="text-align:left; float:center">Growth In Obese Population &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New York City Boroughs</h2></br>
+</br></br></br></br>
+
+
+ <div class="container" id="graph">
+</div>
+ <div class="container" id="graph1">
+</div>
+<div class="container" id="body">
+</div>
+<div id="graph"></div>
+<div id="graph1"></div>
+
+<script type="text/javascript">
+
+// Coded by Patrick.Brockmann@lsce.ipsl.fr
+
+$(document).ready(function() {
+
+$("#slider").slider({
+ value:2008,
+ min: 2008,
+ max: 2040,
+ step: 1,
+ slide: function( event, ui ) {
+   $("#year").val(ui.value);
+   Yellowraw(ui.value.toString());
+   Yellowraw1(ui.value.toString());
+ }
+});
+$("#year").val($("#slider").slider("value") );
+
+var w = 700;
+var h = 700;
+
+var xy = d3.geo.equirectangular()
+         .scale(1000);
+
+var path = d3.geo.path()
+   .projection(xy);
+
+var svg = d3.select("#graph").insert("svg:svg")
+ .attr("width", w)
+       .attr("height", h);
+
+var states = svg.append("svg:g")
+   .attr("id", "states");
+
+var circles = svg.append("svg:g")
+   .attr("id", "circles");
+
+var labels = svg.append("svg:g")
+   .attr("id", "labels");
+
+var legendRectSize = 27,
+    legendSpacing  = 5,
+  gapBetweenGroups = 12,
+  spaceForLabels   = 150,
+    spaceForLegend   = 150,
+  chartWidth       = -100;
+  
+var color = d3.scale.category20();
+var legenddata = ["Bronx","Manhattan","Queens","Brooklyn","Staten Island",];  
+ var legend = svg.selectAll('.legend')
+    .data(legenddata)
+    .enter()
+    .append('g')
+    .attr('transform', function (d, i) {
+        var height = legendRectSize + legendSpacing;
+        var offset = -gapBetweenGroups/2;
+        var horz = spaceForLabels + chartWidth + 40 - legendRectSize;
+        var vert = i * height - offset;
+        return 'translate(' + horz + ',' + vert + ')';
+    });
+legend.append('rect')
+    .attr('width', legendRectSize)
+    .attr('height', legendRectSize)
+    .style('fill', function (d) { if(d=="Brooklyn"){
+    return "Orange";
+    }
+    else if(d=="Bronx"){
+    return "Yellow";
+    }
+        else if(d=="Manhattan"){
+    return "steelblue";
+    }
+        else if(d=="Queens"){
+    return "Green";
+    }
+        else if(d=="Staten Island"){
+    return "Red";
+    }
+    else{
+    return "Yellow";
+    }
+    })
+    .style('stroke', function (d, i) { return color(i); });
+
+legend.append('text')
+    .attr('class', 'legend')
+    .attr('x', legendRectSize + legendSpacing)
+    .attr('y', legendRectSize - legendSpacing)
+    .text(function (d) { return d; })
+    .style("font-size","20px");
+
+
+
+/*d3.json("world-countries.json", function(collection) {
+ states.selectAll("path")
+     .data(collection.features)
+   .enter().append("svg:path")
+     .attr("d", path)
+           .on("mouseover", function(d) {
+               d3.select(this).style("fill","#6C0")
+                   .append("svg:title")
+                   .text(d.properties.name);})
+           .on("mouseout", function(d) {
+               d3.select(this).style("fill","#ccc");})
+});*/
+
+
+//http://stackoverflow.com/questions/11386150/lat-lon-positon-on-a-d3-js-map
+// +convert to string to number
+
+var scalefactor=1./40. ;
+
+d3.csv("co2_regions_new.csv", function(csv) {
+ circles.selectAll("circle")
+     .data(csv)
+   .enter()
+   .append("svg:circle")
+     .attr("cx", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[0]; })
+     .attr("cy", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[1]; })
+     .attr("r",  function(d) { return (+d["2008"])*scalefactor; })
+     .attr("title",  function(d) { return d["borough"]+": "+Math.round(d["2008"]); })
+     .attr("fill",function(d){
+if(d["borough"]=="Bronx"){
+
+              d3.select(this).style("fill","Yellow").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Staten Island"){
+
+              d3.select(this).style("fill","Red").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Manhattan"){
+
+              d3.select(this).style("fill","steelblue").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Queens"){
+
+              d3.select(this).style("fill","Green").style("fill-opacity",0.6); 
+             } 
+             else if(d["borough"]=="Brooklyn"){
+
+              d3.select(this).style("fill","Orange").style("fill-opacity",0.6); 
+             }
+             else{
+               d3.select(this).style("fill","steelblue");
+             }
+
+     })
+           .on("mouseover", mouseover)
+           .on("mouseout",function(d){
+
+            $(".mouseover").text("");
+ $(".mouseover").css("display","none");
+
+ if(d["borough"]=="Bronx"){
+
+              d3.select(this).style("fill","Yellow").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Staten Island"){
+
+              d3.select(this).style("fill","Red").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Manhattan"){
+
+              d3.select(this).style("fill","steelblue").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Queens"){
+
+              d3.select(this).style("fill","Green").style("fill-opacity",0.6); 
+             } 
+             else if(d["borough"]=="Brooklyn"){
+
+              d3.select(this).style("fill","Orange").style("fill-opacity",0.6); 
+             }
+             else{
+               d3.select(this).style("fill","steelblue");
+             }
+           });
+
+           function mouseover(d){
+  //alert("dude!");
+//d3.select(this).style("fill","steelblue");
+  
+
+  if(d["borough"]=="Bronx"){
+
+               var text = "Bronx";
+               d3.select(this).style("fill","Yellow").style("fill-opacity",1); 
+
+              }
+              else if(d["borough"]=="Staten Island"){
+
+                              var text = "Staten Island";
+                              d3.select(this).style("fill","Red").style("fill-opacity",1);
+                            }
+              else if(d["borough"]=="Manhattan"){
+
+               var text = "Manhattan";
+               d3.select(this).style("fill","steelblue").style("fill-opacity",1); 
+              }
+              else if(d["borough"]=="Queens"){
+
+               var text = "Queens";
+               d3.select(this).style("fill","Green").style("fill-opacity",1); 
+              } 
+              else if(d["borough"]=="Brooklyn"){
+
+               var text = "Brooklyn";
+               d3.select(this).style("fill","Orange").style("fill-opacity",1); 
+              }
+              else{
+                var text=" ";
+              }
+  // you can add any more information to the mouseover
+  // here, using data in your JSON
+  $(".mouseover").html(text);
+  $(".mouseover").css("display","inline");
+}
+
+
+
+ labels.selectAll("labels")
+     .data(csv)
+   .enter()
+   .append("svg:text")
+       .attr("x", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[0]; })
+       .attr("y", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[1]; })
+       .attr("dy", "0.3em")
+       .attr("text-anchor", "middle")
+       .text(function(d) { return Math.round(d["a2008"]); });
+
+
+
+      
+});
+
+function Yellowraw(year) {
+ if(year==2008 || year==2009 || year==2010 || year==2011 || year==2012 || year==2013 || year==2015 || year==2020|| year==2025 || year==2030 || year==2035 || year==2040)
+ {
+     circles.selectAll("circle")
+   .transition()
+         .duration(500).ease("linear")
+         .attr("r",  function(d) { return (+d[year])*scalefactor; })
+         .attr("title",  function(d) { 
+
+           return d["borough"]+": "+Math.round(d["a"+year]); 
+         });
+
+     labels.selectAll("text")
+         .text(function(d) { 
+           return Math.round(d["a"+year]); 
+       });
+}
+else{
+circles.selectAll("circle")
+   .transition()
+         .duration(500).ease("linear")
+         .attr("r",  function(d) { return (+d[year])*scalefactor; })
+         .attr("title",  function(d) { 
+
+           return d["borough"]+": "+Math.round(d["a"+year]); 
+         });
+
+               labels.selectAll("text")
+         .text(function(d) { 
+           return " "; 
+       });
+
+}
+}
+
+/*var img = svg.append("svg:image")
+   .attr("xlink:href", "http://nycmap360.com/carte/png/plan_arrondissement_new_york.png")
+   .attr("width", 1200)
+   .attr("height", 500)
+   .attr("x", 228)
+   .attr("y",53);
+*/
+
+//Obesity bubbles
+
+
+
+var w = 700;
+var h = 700;
+
+var xy = d3.geo.equirectangular()
+         .scale(1000);
+
+var path = d3.geo.path()
+   .projection(xy);
+
+var svg = d3.select("#graph1").insert("svg:svg")
+ .attr("width", w)
+       .attr("height", h);
+
+var states = svg.append("svg:g")
+   .attr("id", "states");
+
+var circles1 = svg.append("svg:g")
+   .attr("id", "circles");
+
+var labels1 = svg.append("svg:g")
+   .attr("id", "labels");
+
+
+
+/*d3.json("world-countries.json", function(collection) {
+ states.selectAll("path")
+     .data(collection.features)
+   .enter().append("svg:path")
+     .attr("d", path)
+           .on("mouseover", function(d) {
+               d3.select(this).style("fill","#6C0")
+                   .append("svg:title")
+                   .text(d.properties.name);})
+           .on("mouseout", function(d) {
+               d3.select(this).style("fill","#ccc");})
+});*/
+
+
+//http://stackoverflow.com/questions/11386150/lat-lon-positon-on-a-d3-js-map
+// +convert to string to number
+
+var scalefactor1=1./80. ;
+
+d3.csv("co2_regions_new.csv", function(csv) {
+ circles1.selectAll("circle")
+     .data(csv)
+   .enter()
+   .append("svg:circle")
+     .attr("cx", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[0]; })
+     .attr("cy", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[1]; })
+     .attr("r",  function(d) { return (+d["2108"])*scalefactor1; })
+     .attr("title",  function(d) { return d["borough"]+": "+Math.round(d["2108"]); })
+     .attr("fill",function(d){
+if(d["borough"]=="Bronx"){
+
+              d3.select(this).style("fill","Yellow").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Staten Island"){
+
+              d3.select(this).style("fill","Red").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Manhattan"){
+
+              d3.select(this).style("fill","steelblue").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Queens"){
+
+              d3.select(this).style("fill","Green").style("fill-opacity",0.6); 
+             } 
+             else if(d["borough"]=="Brooklyn"){
+
+              d3.select(this).style("fill","Orange").style("fill-opacity",0.6); 
+             }
+             else{
+               d3.select(this).style("fill","steelblue");
+             }
+
+     })
+           .on("mouseover", mouseover)
+           .on("mouseout",function(d){
+
+            $(".mouseover").text("");
+ $(".mouseover").css("display","none");
+
+ if(d["borough"]=="Bronx"){
+
+              d3.select(this).style("fill","Yellow").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Staten Island"){
+
+              d3.select(this).style("fill","Red").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Manhattan"){
+
+              d3.select(this).style("fill","steelblue").style("fill-opacity",0.6); 
+             }
+             else if(d["borough"]=="Queens"){
+
+              d3.select(this).style("fill","Green").style("fill-opacity",0.6); 
+             } 
+             else if(d["borough"]=="Brooklyn"){
+
+              d3.select(this).style("fill","Orange").style("fill-opacity",0.6); 
+             }
+             else{
+               d3.select(this).style("fill","steelblue");
+             }
+           });
+
+           function mouseover(d){
+  //alert("dude!");
+//d3.select(this).style("fill","steelblue")
+  
+
+  if(d["borough"]=="Bronx"){
+
+               var text = "Bronx";
+                             d3.select(this).style("fill","Yellow").style("fill-opacity",1); 
+              }
+              else if(d["borough"]=="Staten Island"){
+
+                              var text = "Staten Island";
+                              d3.select(this).style("fill","Red").style("fill-opacity",1);
+                            }
+              else if(d["borough"]=="Manhattan"){
+
+               var text = "Manhattan"; 
+               d3.select(this).style("fill","steelblue").style("fill-opacity",1);
+              }
+              else if(d["borough"]=="Queens"){
+
+               var text = "Queens"; 
+               d3.select(this).style("fill","Green").style("fill-opacity",1);
+              } 
+              else if(d["borough"]=="Brooklyn"){
+
+               var text = "Brooklyn"; 
+               d3.select(this).style("fill","Orange").style("fill-opacity",1);
+              }
+              else{
+                var text=" ";
+              }
+  // you can add any more information to the mouseover
+  // here, using data in your JSON
+  $(".mouseover").html(text);
+  $(".mouseover").css("display","inline");
+}
+
+ labels1.selectAll("labels")
+     .data(csv)
+   .enter()
+   .append("svg:text")
+       .attr("x", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[0]; })
+       .attr("y", function(d, i) { return xy([+d["longitude"],+d["latitude"]])[1]; })
+       .attr("dy", "0.3em")
+       .attr("text-anchor", "middle")
+       .text(function(d) { return Math.round(d["o2008"]); });
+
+ 
+
+
+});
+
+function Yellowraw1(year) {
+ if(year==2008 || year==2009 || year==2010 || year==2011 || year==2012 || year==2013 || year==2015 || year==2020|| year==2025 || year==2030 || year==2035 || year==2040)
+ {
+
+nyear=Number(year)+100;
+console.log(nyear);
+
+     circles1.selectAll("circle")
+   .transition()
+         .duration(500).ease("linear")
+         .attr("r",  function(d) { 
+          return (+d[nyear])*scalefactor1; })
+         .attr("title",  function(d) { 
+           return d["borough"]+": "+Math.round(d["o"+year]); 
+         });
+
+     labels1.selectAll("text")
+         .text(function(d) { 
+           return Math.round(d["o"+year]); 
+       });
+}
+else{
+circles1.selectAll("circle")
+   .transition()
+         .duration(500).ease("linear")
+         .attr("r",  function(d) { return (+d[nyear])*scalefactor1; })
+         .attr("title",  function(d) { 
+
+           return d["borough"]+": "+Math.round(d["o"+year]); 
+         });
+
+               labels1.selectAll("text")
+         .text(function(d) { 
+           return " "; 
+       });
+
+}
+}
+
+
+/*var img = svg.append("svg:image")
+   .attr("xlink:href", "http://nycmap360.com/carte/png/plan_arrondissement_new_york.png")
+   .attr("width", 1200)
+   .attr("height", 500)
+   .attr("x", 228)
+   .attr("y",53);
+*/
+});
+
+
+
+//Map creation started
+
+var width = 1000,
+   height = 700;
+var g; // this is the container that will hold the zips
+var x,y,k=1; // parameters to hold the zooming and panning state
+var centeYellow;
+var sum_dx=0;
+var sum_dy=0;
+
+/*
+var projection = d3.geo.conicConformal()
+     .parallels([40 + 40 / 60, 41 + 2 / 60])
+     .scale(70000)
+     .rotate([74, -40 - 45 / 60]);
+*/
+
+var projection = d3.geo.albersUsa()
+.scale(82485)
+.translate([-23700,5980]);
+
+var path = d3.geo.path().projection(projection);
+
+queue()
+   .defer(d3.json, "nycboro1.json")
+   .await(ready);
+
+
+
+function getColor(d){
+ // set this color spectrum to be dependent
+ // on any parameter of your JSON!
+ //var ratio=(d["properties"]["Shape_Area"])/1000000.;
+ //if(ratio>0){
+ //  return d3.hsl(255-ratio,0.4,0.5);
+ //}else{
+ //  return "lightgrey";
+ //}
+
+ if(d["properties"]["borough"]=="Queens"){
+   return "Green";
+ }
+ else if(d["properties"]["borough"]=="Bronx"){
+   return "Yellow";
+ }
+ else if(d["properties"]["borough"]=="Staten Island"){
+   return "Red";
+ }
+ else if(d["properties"]["borough"]=="Manhattan"){
+   return "steelblue";
+ }
+ else if(d["properties"]["borough"]=="Brooklyn"){
+   return "Orange";
+ }
+ else {
+   return "lightgrey";
+ }
+
+
+}
+
+
+
+// add a d3 behavior handler.
+var drag = d3.behavior.drag()
+       .on("drag",function(d){dragging(d);});
+
+var svg = d3.select("#body").append("svg")
+   .attr("width", width)
+   .attr("height", height)
+ .call(drag);
+
+
+function ready(error, map) {
+ g=svg.append("g")
+     .attr("class", "zipcode")
+   .attr("id", "zips")
+   .call(drag);
+
+ g.selectAll("path")
+     .data(map.features)
+   .enter().append("path")
+     .attr("d", path)
+   .style("fill",function(d){
+    if(d["properties"]["borough"]=="Bronx"){
+
+              return d3.select(this).style("fill","Yellow").style("fill-opacity",0.6); 
+             }
+             else if(d["properties"]["borough"]=="Staten Island"){
+
+              return d3.select(this).style("fill","Red").style("fill-opacity",0.6); 
+             }
+             else if(d["properties"]["borough"]=="Manhattan"){
+
+              return d3.select(this).style("fill","steelblue").style("fill-opacity",0.6); 
+             }
+             else if(d["properties"]["borough"]=="Queens"){
+
+              return d3.select(this).style("fill","Green").style("fill-opacity",0.6); 
+             } 
+             else if(d["properties"]["borough"]=="Brooklyn"){
+
+              return d3.select(this).style("fill","Orange").style("fill-opacity",0.6); 
+             }
+             else{
+               return d3.select(this).style("fill","steelblue");
+             }
+
+   })
+     .on("click", click)       // now we have a click handler
+     .on("mouseover",mouseover)
+   .on("mouseout",mouseout);
+}
+
+function mouseover(d){
+ //alert("dude!");
+ var text = d["properties"]["borough"] + " population:";
+ var tp2008 = "2008 - Total: " + d.properties["pop"][0]+"  Obese: "+ d.properties["obs"][0];
+ var tp2009 = "2009 - Total: " + d.properties["pop"][1]+"  Obese: "+ d.properties["obs"][1];
+ var tp2010 = "2010 - Total: " + d.properties["pop"][2]+"  Obese: "+ d.properties["obs"][2];
+ var tp2011 = "2011 - Total: " + d.properties["pop"][3]+"  Obese: "+ d.properties["obs"][3];
+ var tp2012 = "2012 - Total: " + d.properties["pop"][4]+"  Obese: "+ d.properties["obs"][4];
+ var tp2013 = "2013 - Total: " + d.properties["pop"][5]+"  Obese: "+ d.properties["obs"][5];
+ var tp2015 = "2015 - Total: " + d.properties["pop"][6]+"  Obese: "+ d.properties["obs"][6];
+ var tp2020 = "2020 - Total: " + d.properties["pop"][7]+"  Obese: "+ d.properties["obs"][7];
+ var tp2025 = "2025 - Total: " + d.properties["pop"][8]+"  Obese: "+ d.properties["obs"][8];
+ var tp2030 = "2030 - Total: " + d.properties["pop"][9]+"  Obese: "+ d.properties["obs"][9];
+ var tp2035 = "2035 - Total: " + d.properties["pop"][10]+"  Obese: "+ d.properties["obs"][10];
+ var tp2040 = "2040 - Total: " + d.properties["pop"][11]+"  Obese: "+ d.properties["obs"][11];
+
+ if(d["properties"]["borough"]=="Bronx"){
+
+              d3.select(this).style("fill","Yellow").style("fill-opacity",1); 
+             }
+             else if(d["properties"]["borough"]=="Staten Island"){
+
+              d3.select(this).style("fill","Red").style("fill-opacity",1); 
+             }
+             else if(d["properties"]["borough"]=="Manhattan"){
+
+              d3.select(this).style("fill","steelblue").style("fill-opacity",1); 
+             }
+             else if(d["properties"]["borough"]=="Queens"){
+
+            d3.select(this).style("fill","Green").style("fill-opacity",1); 
+             } 
+             else if(d["properties"]["borough"]=="Brooklyn"){
+
+              d3.select(this).style("fill","Orange").style("fill-opacity",1); 
+             }
+             else{
+               d3.select(this).style("fill","steelblue");
+             }
+ // you can add any more information to the mouseover
+ // here, using data in your JSON
+ $(".mouseover").html(text+"<br>"+tp2008+"<br>"+tp2009+"<br>"+tp2010+"<br>"+tp2011+"<br>"+tp2012+"<br>"+tp2013+"<br>"+tp2015+"<br>"+tp2020+"<br>"+tp2025+"<br>"+tp2030+"<br>"+tp2035+"<br>"+tp2040);
+ $(".mouseover").css("display","inline");
+}
+
+function mouseout(d){
+   d3.select("#arcSelection").remove();
+
+   if(d["properties"]["borough"]=="Bronx"){
+
+              d3.select(this).style("fill","Yellow").style("fill-opacity",0.6); 
+             }
+             else if(d["properties"]["borough"]=="Staten Island"){
+
+              d3.select(this).style("fill","Red").style("fill-opacity",0.6); 
+             }
+             else if(d["properties"]["borough"]=="Manhattan"){
+
+             d3.select(this).style("fill","steelblue").style("fill-opacity",0.6); 
+             }
+             else if(d["properties"]["borough"]=="Queens"){
+
+               d3.select(this).style("fill","Green").style("fill-opacity",0.6); 
+             } 
+             else if(d["properties"]["borough"]=="Brooklyn"){
+
+               d3.select(this).style("fill","Orange").style("fill-opacity",0.6); 
+             }
+             else{
+               d3.select(this).style("fill","steelblue");
+             }
+
+ $(".mouseover").text("");
+ $(".mouseover").css("display","none");
+}
+
+// moves the mouseover box whenever the mouse is moved.
+d3.select('html') // Selects the 'html' element
+ .on('mousemove', function()
+   {
+   var locs=d3.mouse(this);  // get the mouse coordinates
+
+   // add some padding
+   locs[0]+=15;
+   locs[1]+=5;
+
+   $("div.mouseover").css("margin-left",locs[0]);
+   $("div.mouseover").css("margin-top",locs[1]);
+   });
+
+
+// zooms in on a click. Zooms back out when you click the same location.
+// if you're zoomed in, but not centeYellow on the same zipcode, pan across to that zipcode.
+function click(d) {
+ if (d && centeYellow !== d) {
+   var centroid = path.centroid(d);
+   x = centroid[0];
+   y = centroid[1];
+   k = 1.5;
+   centeYellow = d;
+ } else {
+   x = width / 2;
+   y = height / 2;
+   k = 1;
+   centeYellow = null;
+ }
+ g.transition()
+     .duration(1000)
+     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")\
+         scale(" + k + ")translate(" + -x + "," + -y + ")")
+     .style("stroke-width", 1 / k + "px");
+
+     }
+
+function dragging(d){
+ // first turn off the mouseover
+ $(".mouseover").css("display","none");
+ // get the deltas that define the relative movement of the cursor
+ dx=d3.event.dx/(1.*k);
+ dy=d3.event.dy/(1.*k);
+
+ sum_dx+=dx;
+ sum_dy+=dy;
+
+ x-=dx;
+ y-=dy;
+
+ // update the transformation.
+ g.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")\
+           scale(" + k + ")\
+           translate(" + -x + "," + -y + ")")
+}
+
+
+
+
+</script>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+<p>
+<label for="year" style="margin-left:0px;">Year :</label>
+<input type="text" id="year" style="margin-left:0px; border:0; color:#f6931f; font-weight:bold; " />
+</p>
+<div id="slider" style="width: 200px; margin-left:1100px;"></div>
+<p style="font-size: 200%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Drag slider to change year and visualize the growth in overall population and obese population in New York City</p>
+
+
+
+<p style="font-size: 200%;" align="left">The above D3 visualization displays the increase in the total population and obese population in the city of New York from 2008 to 2013. In addition, we have used the predicted values for population from 2015 to 2040 to display the population explosion that we can expect in the next 3 decades. While we utilized the total population data from NYC OpenData, we corelated the increase in obese population for the same duration using R and creating a linear regression model that supported our claim that with the increase in total population, there will be an increase in the obese population in the city of New York.<br/><b>Source(s):</b> NYC OpenData, The New York City Department of Health and Mental Hygiene </p>
+
+
+  <p style="font-size: 200%;" align="left">Below is a step by step creation of the model in order to predict whether the obese population would increase with the increase in total population. In order to perform predictive analysis there were a few assumptions that we needed to make and ensure that the model was a good fit within those assumptions.</p>
+  <p style="font-size: 200%;" align="left"><b>Adult Consumption of Sugary Drinks (1+/day) - Number of Adults Reporting
+Calculation:</b> Estimated number of adults who, on average reported having consumed one or more sugary drinks per day. Sugary drinks include soda, sweetened iced tea, sports drinks, fruit punch, and other fruit flavored drinks. (One drink equals 12-ounces.) Diet soda, sugar free drinks, 100% juice, and seltzer are not included.<br/><b>Source(s):</b> New York City Community Health Survey (CHS) </p>
+
+
+<p style="font-size: 200%;" align="left"><b>Adult Consumption of Sugary Drinks (1+/day) - Percent
+Calculation:</b> Estimated number of adults who, on average reported having consumed one or more sugary drinks per day, divided by all adults in the area; expressed as a percent. Sugary drinks include soda, sweetened iced tea, sports drinks, fruit punch, and other fruit flavored drinks. (One drink equals 12 ounces). Diet soda, sugar free drinks, 100% juice, and seltzer are not included.<br/><b>Source(s): </b>New York City Community Health Survey (CHS)</p>
+
+
+
+<p style="font-size: 200%;" align="left"><b>Overweight or Obese Adults - Number
+Calculation:</b> Estimated number of adults classified as overweight or obese; based on the Body Mass Index (BMI) calculated from self-reported weight and height, rounded to the nearest 1,000. A BMI between 25 and 29.9 is classified as overweight, and a BMI of 30 or greater is classified as obese.<br/><b>Source(s):</b> New York City Community Health Survey (CHS)</p>
+
+
+
+<p style="font-size: 200%;" align="left"><b>Overweight or Obese Adults - Percent
+Calculation:</b> Estimated number of adults classified as overweight or obese; based on the Body Mass Index (BMI) calculated from self-reported weight and height, expressed as a percent. A BMI between 25 and 29.9 is classified as overweight, and a BMI of 30 or greater is classified as obese.<br/><b>Source(s):</b> New York City Community Health Survey (CHS)</p>
+
+<p style="font-size: 200%;" align="left"><b>Creating the linear regression model:</b><br/>When conducting any statistical analysis it is important to evaluate how well the model fits the data and that the data meets the assumptions of the model.</p>
+
+
+</p>  
+<p>
+<div style="text-align: center;">
+
+  <img height="1200" width="2000" src="R1.png"><br/><br/><br/><br/><br/><br/>
+    <img height="1200" width="2000" src="R2.png"><br/><br/><br/><br/><br/><br/>
+    <p style="font-size: 200%;" align="left"><b>Cross-validation:</b>is a technique used to protect against overfitting in a predictive model, particularly in a case where the amount of data may be limited. In cross-validation, you make a fixed number of folds (or partitions) of the data, run the analysis on each fold, and then average the overall error estimate.</p>
+    <p style="font-size: 200%;" align="left"><b>Mean square error:</b>representing the difference between the actual observations and the observation values predicted by the model, is used to determine the extent to which the model fits the data and whether the removal or some explanatory variables, simplifying the model, is possible without significantly harming the model's predictive ability.</p><br/><br/><br/>
+      <img height="1200" width="2000" src="R3.png"><br/><br/><br/>
+    <p style="font-size: 200%;" align="left">Through the Tableau visualization we are trying to show how with each year there is an increase in not only the total population in the city of New York but also an increase in the obese population.</p> 
+  <img height="1200" width="2000" src="pic1.png"><br/><br/><br/>
+      <p style="font-size: 200%;" align="left">It is important to note that four of the top ten causes of death in the United States are caused by obesity. These are - Heart diseases, Strokes, some forms of Cancer and Type 2 Diabetes. While we realize that obesity does not always lead to these diseases, the fact that these diseases are more prevalent in obese people is something that cannot be disregarded.</p><br/><br/><br/>
+      <img height="1200" width="2000" src="pic2.png"><br/><br/><br/>
+</div>
+</p>
+</body>
+
+</html>
