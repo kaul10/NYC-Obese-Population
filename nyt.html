@@ -75,11 +75,14 @@ div.mouseover{
 <body>
   <div style="text-align: center;">
   <div style="text-align: center;">
-<h1 align="center" style="font-size: 400%;">Explosion of General and Obese Population in New York City</h1>
-</br></br>
-<h2 id="pop" style="text-align:left; float:left">Growth In Overall Population</h2>
-<h2 id="obs" style="text-align:left; float:center">Growth In Obese Population &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New York City Boroughs</h2></br>
-</br></br></br></br>
+<h1 align="center" style="font-size: 150%;">Explosion of General and Obese Population in New York City</h1>
+<p align="left">
+<label for="year" align="left">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspYear :</label>
+<input type="text" id="year" style="margin-left:0px; border:0; color:#f6931f; font-weight:bold; " />
+</p>
+<div id="slider" style="width: 200px; margin-left:50px;"></div>
+
+<br/><br/>
 
 
  <div class="container" id="graph">
@@ -110,8 +113,8 @@ $("#slider").slider({
 });
 $("#year").val($("#slider").slider("value") );
 
-var w = 700;
-var h = 700;
+var w = 450;
+var h = 500;
 
 var xy = d3.geo.equirectangular()
          .scale(1000);
@@ -374,8 +377,8 @@ circles.selectAll("circle")
 
 
 
-var w = 700;
-var h = 700;
+var w = 450;
+var h = 500;
 
 var xy = d3.geo.equirectangular()
          .scale(1000);
@@ -415,7 +418,7 @@ var labels1 = svg.append("svg:g")
 //http://stackoverflow.com/questions/11386150/lat-lon-positon-on-a-d3-js-map
 // +convert to string to number
 
-var scalefactor1=1./80. ;
+var scalefactor1=1./100. ;
 
 d3.csv("co2_regions_new.csv", function(csv) {
  circles1.selectAll("circle")
@@ -590,8 +593,8 @@ circles1.selectAll("circle")
 
 //Map creation started
 
-var width = 1000,
-   height = 700;
+var width = 650,
+   height = 750;
 var g; // this is the container that will hold the zips
 var x,y,k=1; // parameters to hold the zooming and panning state
 var centeYellow;
@@ -601,13 +604,13 @@ var sum_dy=0;
 /*
 var projection = d3.geo.conicConformal()
      .parallels([40 + 40 / 60, 41 + 2 / 60])
-     .scale(70000)
-     .rotate([74, -40 - 45 / 60]);
+     .scale(7000)
+     .rotate([100,-50]);
 */
 
 var projection = d3.geo.albersUsa()
-.scale(82485)
-.translate([-23700,5980]);
+.scale(82000)
+.translate([-23900,5980]);
 
 var path = d3.geo.path().projection(projection);
 
@@ -662,13 +665,13 @@ var svg = d3.select("#body").append("svg")
 
 
 function ready(error, map) {
- g=svg.append("g")
+g=svg.append("g")
      .attr("class", "zipcode")
    .attr("id", "zips")
    .call(drag);
 
  g.selectAll("path")
-     .data(map.features)
+	.data(map.features)
    .enter().append("path")
      .attr("d", path)
    .style("fill",function(d){
@@ -809,7 +812,7 @@ function click(d) {
    centeYellow = null;
  }
  g.transition()
-     .duration(1000)
+   .duration(1000)
      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")\
          scale(" + k + ")translate(" + -x + "," + -y + ")")
      .style("stroke-width", 1 / k + "px");
@@ -843,52 +846,44 @@ function dragging(d){
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
-<p>
-<label for="year" style="margin-left:0px;">Year :</label>
-<input type="text" id="year" style="margin-left:0px; border:0; color:#f6931f; font-weight:bold; " />
-</p>
-<div id="slider" style="width: 200px; margin-left:1100px;"></div>
-<p style="font-size: 200%;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Drag slider to change year and visualize the growth in overall population and obese population in New York City</p>
+
+<p style="font-size: 100%;" align="left">The above D3 visualization displays the increase in the total population and obese population in the city of New York from 2008 to 2013. In addition, we have used the predicted values for population from 2015 to 2040 to display the population explosion that we can expect in the next 3 decades. While we utilized the total population data from NYC OpenData, we corelated the increase in obese population for the same duration using R and creating a linear regression model that supported our claim that with the increase in total population, there will be an increase in the obese population in the city of New York.<br/><b>Source(s):</b> NYC OpenData, The New York City Department of Health and Mental Hygiene </p>
 
 
-
-<p style="font-size: 200%;" align="left">The above D3 visualization displays the increase in the total population and obese population in the city of New York from 2008 to 2013. In addition, we have used the predicted values for population from 2015 to 2040 to display the population explosion that we can expect in the next 3 decades. While we utilized the total population data from NYC OpenData, we corelated the increase in obese population for the same duration using R and creating a linear regression model that supported our claim that with the increase in total population, there will be an increase in the obese population in the city of New York.<br/><b>Source(s):</b> NYC OpenData, The New York City Department of Health and Mental Hygiene </p>
-
-
-  <p style="font-size: 200%;" align="left">Below is a step by step creation of the model in order to predict whether the obese population would increase with the increase in total population. In order to perform predictive analysis there were a few assumptions that we needed to make and ensure that the model was a good fit within those assumptions.</p>
-  <p style="font-size: 200%;" align="left"><b>Adult Consumption of Sugary Drinks (1+/day) - Number of Adults Reporting
+  <p style="font-size: 100%;" align="left">Below is a step by step creation of the model in order to predict whether the obese population would increase with the increase in total population. In order to perform predictive analysis there were a few assumptions that we needed to make and ensure that the model was a good fit within those assumptions.</p>
+  <p style="font-size: 100%;" align="left"><b>Adult Consumption of Sugary Drinks (1+/day) - Number of Adults Reporting
 Calculation:</b> Estimated number of adults who, on average reported having consumed one or more sugary drinks per day. Sugary drinks include soda, sweetened iced tea, sports drinks, fruit punch, and other fruit flavored drinks. (One drink equals 12-ounces.) Diet soda, sugar free drinks, 100% juice, and seltzer are not included.<br/><b>Source(s):</b> New York City Community Health Survey (CHS) </p>
 
 
-<p style="font-size: 200%;" align="left"><b>Adult Consumption of Sugary Drinks (1+/day) - Percent
+<p style="font-size: 100%;" align="left"><b>Adult Consumption of Sugary Drinks (1+/day) - Percent
 Calculation:</b> Estimated number of adults who, on average reported having consumed one or more sugary drinks per day, divided by all adults in the area; expressed as a percent. Sugary drinks include soda, sweetened iced tea, sports drinks, fruit punch, and other fruit flavored drinks. (One drink equals 12 ounces). Diet soda, sugar free drinks, 100% juice, and seltzer are not included.<br/><b>Source(s): </b>New York City Community Health Survey (CHS)</p>
 
 
 
-<p style="font-size: 200%;" align="left"><b>Overweight or Obese Adults - Number
+<p style="font-size: 100%;" align="left"><b>Overweight or Obese Adults - Number
 Calculation:</b> Estimated number of adults classified as overweight or obese; based on the Body Mass Index (BMI) calculated from self-reported weight and height, rounded to the nearest 1,000. A BMI between 25 and 29.9 is classified as overweight, and a BMI of 30 or greater is classified as obese.<br/><b>Source(s):</b> New York City Community Health Survey (CHS)</p>
 
 
 
-<p style="font-size: 200%;" align="left"><b>Overweight or Obese Adults - Percent
+<p style="font-size: 100%;" align="left"><b>Overweight or Obese Adults - Percent
 Calculation:</b> Estimated number of adults classified as overweight or obese; based on the Body Mass Index (BMI) calculated from self-reported weight and height, expressed as a percent. A BMI between 25 and 29.9 is classified as overweight, and a BMI of 30 or greater is classified as obese.<br/><b>Source(s):</b> New York City Community Health Survey (CHS)</p>
 
-<p style="font-size: 200%;" align="left"><b>Creating the linear regression model:</b><br/>When conducting any statistical analysis it is important to evaluate how well the model fits the data and that the data meets the assumptions of the model.</p>
+<p style="font-size: 100%;" align="left"><b>Creating the linear regression model:</b><br/>When conducting any statistical analysis it is important to evaluate how well the model fits the data and that the data meets the assumptions of the model.</p>
 
 
 </p>  
 <p>
 <div style="text-align: center;">
 
-  <img height="1200" width="2000" src="R1.png"><br/><br/><br/><br/><br/><br/>
-    <img height="1200" width="2000" src="R2.png"><br/><br/><br/><br/><br/><br/>
-    <p style="font-size: 200%;" align="left"><b>Cross-validation:</b>is a technique used to protect against overfitting in a predictive model, particularly in a case where the amount of data may be limited. In cross-validation, you make a fixed number of folds (or partitions) of the data, run the analysis on each fold, and then average the overall error estimate.</p>
-    <p style="font-size: 200%;" align="left"><b>Mean square error:</b>representing the difference between the actual observations and the observation values predicted by the model, is used to determine the extent to which the model fits the data and whether the removal or some explanatory variables, simplifying the model, is possible without significantly harming the model's predictive ability.</p><br/><br/><br/>
-      <img height="1200" width="2000" src="R3.png"><br/><br/><br/>
-    <p style="font-size: 200%;" align="left">Through the Tableau visualization we are trying to show how with each year there is an increase in not only the total population in the city of New York but also an increase in the obese population.</p> 
-  <img height="1200" width="2000" src="pic1.png"><br/><br/><br/>
-      <p style="font-size: 200%;" align="left">It is important to note that four of the top ten causes of death in the United States are caused by obesity. These are - Heart diseases, Strokes, some forms of Cancer and Type 2 Diabetes. While we realize that obesity does not always lead to these diseases, the fact that these diseases are more prevalent in obese people is something that cannot be disregarded.</p><br/><br/><br/>
-      <img height="1200" width="2000" src="pic2.png"><br/><br/><br/>
+  <img height="800" width="1000" src="R1.png"><br/><br/><br/><br/><br/><br/>
+    <img height="800" width="1000" src="R2.png"><br/><br/><br/><br/><br/><br/>
+    <p style="font-size: 100%;" align="left"><b>Cross-validation:</b>is a technique used to protect against overfitting in a predictive model, particularly in a case where the amount of data may be limited. In cross-validation, you make a fixed number of folds (or partitions) of the data, run the analysis on each fold, and then average the overall error estimate.</p>
+    <p style="font-size: 100%;" align="left"><b>Mean square error:</b>representing the difference between the actual observations and the observation values predicted by the model, is used to determine the extent to which the model fits the data and whether the removal or some explanatory variables, simplifying the model, is possible without significantly harming the model's predictive ability.</p><br/><br/><br/>
+      <img height="800" width="1000" src="R3.png"><br/><br/><br/>
+    <p style="font-size: 100%;" align="left">Through the Tableau visualization we are trying to show how with each year there is an increase in not only the total population in the city of New York but also an increase in the obese population.</p> 
+  <img height="800" width="1000" src="pic1.png"><br/><br/><br/>
+      <p style="font-size: 100%;" align="left">It is important to note that four of the top ten causes of death in the United States are caused by obesity. These are - Heart diseases, Strokes, some forms of Cancer and Type 2 Diabetes. While we realize that obesity does not always lead to these diseases, the fact that these diseases are more prevalent in obese people is something that cannot be disregarded.</p><br/><br/><br/>
+      <img height="800" width="1000" src="pic2.png"><br/><br/><br/>
 </div>
 </p>
 </body>
